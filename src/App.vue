@@ -1,8 +1,14 @@
 <template>
 	<div id="app">
+		<select v-model="currentUserId">
+			<option v-for="user in users" :key="user._id" :value="user._id">
+				{{ user.username }}
+			</option>
+		</select>
+		<button @click="printUsersData">Print data</button>
+		<button @click="addUsersData" :disabled="updatingData">Add data</button>
+		<button @click="deleteUsersData">Delete users'data</button>
 		<ChatContainer/>
-		<button @click="printUsersData">Print Data</button>
-		<button @click="addUsersData" :disabled="updatingData">Add Data</button>
 	</div>
 </template>
 
@@ -36,28 +42,39 @@ export default {
 					avatar:
 						'https://vignette.wikia.nocookie.net/teamavatarone/images/4/45/Yoda.jpg/revision/latest?cb=20130224160049'
 				}
-			], 
+			],
+			currentUserId: 'SGmFnBZB4xxMv9V4CVlW',
 			updatingData: false
 		}
 	},
-	methods : {
+	methods: {
 		async addUsersData() {
-			this.updatingData = true;
-			const user1 = this.users[0];
+			this.updatingData = true
+			const user1 = this.users[0]
 			await usersRef.doc(user1._id).set(user1)
-			const user2 = this.users[1];
+			const user2 = this.users[1]
 			await usersRef.doc(user2._id).set(user2)
-			const user3 = this.users[2];
+			const user3 = this.users[2]
 			await usersRef.doc(user3._id).set(user3)
-			this.updatingData = false;
-		
+			this.updatingData = false
 		},
+		
+		deleteUsersData() {
+			usersRef.get().then(user => {
+				user.forEach(user =>
+					usersRef.doc(user.id).delete()
+				)
+			}).catch(err => {
+				console.log('Error deleting users', err)
+			})
+		},
+
 		printUsersData() {
 			usersRef.get()
-			.then(querySnapshot => querySnapshot.forEach(doc => {
+			.then(user => user.forEach(doc => {
 					console.log(doc.data())
 			})).catch(err => {
-				console.log('Error getting documents', err);
+				console.log('Error getting documents', err)
 			});
 		}
 	}

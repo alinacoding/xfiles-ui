@@ -1,9 +1,11 @@
 <template>
-	<chat-window
-		:current-user-id="currentUserId"
-		:rooms="rooms"
-		:messages="messages"
-	/>
+	<div class="window-container">
+		<chat-window
+			:current-user-id="currentUserId"
+			:rooms="rooms"
+			:messages="messages"
+		/>
+	</div>
 </template>
 
 <script>
@@ -18,8 +20,8 @@
 			return {
 				rooms: [],
 				messages: [],
-				currentUserId: 0
+				currentUserId: 0,
 			}
-		}
+		}, 
 	}	
 </script>
