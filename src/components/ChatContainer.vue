@@ -13,7 +13,7 @@
 	export default {
 		components: {
 			ChatWindow
-		},
+		},	
 		data() {
 			return {
 				rooms: [],
