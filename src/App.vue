@@ -5,24 +5,25 @@
 				{{ user.username }}
 			</option>
 		</select>
-		<button @click="printUsersData">Print data</button>
-		<button @click="addUsersData" :disabled="updatingData">Add data</button>
-		<button @click="deleteUsersData">Delete users'data</button>
-		<ChatContainer/>
-	</div>
+		<button @click="printData">Print data</button>
+		<button @click="addData" :disabled="updatingData">Add data</button>
+		<button @click="deleteData">Delete data</button>
+		<ChatContainer :currentUserId=currentUserId></ChatContainer>
+		</div>
 </template>
+
 
 <script>
 
-import ChatContainer from './components/ChatContainer.vue'
-import { usersRef } from '@/firestore'
-
+import ChatContainer from './components/ChatContainer'
+import { usersRef, roomsRef } from '@/firestore'
 
 export default {
 	name: 'App',
 	components: {
 		ChatContainer
-	}, 
+	},
+
 	data () {
 		return {
 			users: [
@@ -44,11 +45,13 @@ export default {
 				}
 			],
 			currentUserId: 'SGmFnBZB4xxMv9V4CVlW',
-			updatingData: false
+			updatingData: false, 
+			showChat: true
 		}
 	},
 	methods: {
-		async addUsersData() {
+		async addData() {
+			console.log("Adding data currentUserId is ", this.currentUserId)
 			this.updatingData = true
 			const user1 = this.users[0]
 			await usersRef.doc(user1._id).set(user1)
@@ -56,10 +59,32 @@ export default {
 			await usersRef.doc(user2._id).set(user2)
 			const user3 = this.users[2]
 			await usersRef.doc(user3._id).set(user3)
+
+			await roomsRef.add({
+				roomsId: 'ROOM_1',
+				users: [user1._id, user2._id],
+				lastUpdated: new Date()
+			})
+			await roomsRef.add({
+				roomsId: 'ROOM_2',
+				users: [user1._id, user3._id],
+				lastUpdated: new Date()
+			})
+			await roomsRef.add({
+				roomsId: 'ROOM_3',
+				users: [user2._id, user3._id],
+				lastUpdated: new Date()
+			})
+			await roomsRef.add({
+				roomsId: 'ROOM_4',
+				users: [user1._id, user2._id, user3._id],
+				lastUpdated: new Date()
+			})
+			console.log('Added rooms data')
 			this.updatingData = false
 		},
 		
-		deleteUsersData() {
+		async deleteData() {
 			usersRef.get().then(user => {
 				user.forEach(user =>
 					usersRef.doc(user.id).delete()
@@ -67,23 +92,41 @@ export default {
 			}).catch(err => {
 				console.log('Error deleting users', err)
 			})
+			roomsRef.get().then(room => {
+				room.forEach(async room => {
+					console.log("RoomId ", room.id);
+					const ref = roomsRef.doc(room.id).collection('messages')
+					await ref.get().then(res => {
+						if (res.empty) return
+						res.docs.map(doc => ref.doc(doc.id).delete())
+					})
+					roomsRef.doc(room.id).delete()
+				})
+			})
 		},
 
-		printUsersData() {
+		async printData() {
+			console.log("Current user id ", this.currentUserId);
 			usersRef.get()
 			.then(user => user.forEach(doc => {
-					console.log(doc.data())
+				console.log(doc.data())
 			})).catch(err => {
-				console.log('Error getting documents', err)
+				console.log('Error getting users', err)
 			});
+			roomsRef.get()
+			.then(room => room.forEach(doc => {
+				console.log(doc.data())
+			})).catch(err => {
+				console.log('Error getting rooms', err)
+			})
 		}
 	}
 }
+
 </script>
 
 <style>
 #app {
-	font-family: Avenir, Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-align: center;
