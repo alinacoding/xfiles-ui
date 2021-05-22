@@ -12,8 +12,8 @@
 		</div>
 </template>
 
-
 <script>
+//TODO: display rooms
 
 import ChatContainer from './components/ChatContainer'
 import { usersRef, roomsRef } from '@/firestore'
@@ -46,7 +46,8 @@ export default {
 			],
 			currentUserId: 'SGmFnBZB4xxMv9V4CVlW',
 			updatingData: false, 
-			showChat: true
+			showChat: true,
+			rooms: []
 		}
 	},
 	methods: {
@@ -57,15 +58,15 @@ export default {
 			await usersRef.doc(user1._id).set(user1)
 			const user2 = this.users[1]
 			await usersRef.doc(user2._id).set(user2)
-			const user3 = this.users[2]
-			await usersRef.doc(user3._id).set(user3)
+			//const user3 = this.users[2]
+			//await usersRef.doc(user3._id).set(user3)
 
 			await roomsRef.add({
 				roomsId: 'ROOM_1',
 				users: [user1._id, user2._id],
 				lastUpdated: new Date()
 			})
-			await roomsRef.add({
+/*			await roomsRef.add({
 				roomsId: 'ROOM_2',
 				users: [user1._id, user3._id],
 				lastUpdated: new Date()
@@ -80,6 +81,7 @@ export default {
 				users: [user1._id, user2._id, user3._id],
 				lastUpdated: new Date()
 			})
+*/
 			console.log('Added rooms data')
 			this.updatingData = false
 		},
@@ -105,7 +107,7 @@ export default {
 			})
 		},
 
-		async printData() {
+		printData() {
 			console.log("Current user id ", this.currentUserId);
 			usersRef.get()
 			.then(user => user.forEach(doc => {
@@ -125,12 +127,10 @@ export default {
 
 </script>
 
+
 <style>
 #app {
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
 	text-align: center;
-	color: #2c3e50;
 	margin-top: 60px;
 }
 </style>
