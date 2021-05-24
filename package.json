@@ -13,8 +13,7 @@
     "sass": "^1.32.13",
     "sass-loader": "^10.2.0",
     "vue": "^2.6.11",
-    "vue-advanced-chat": "^0.8.5",
-    "vue-plugin-load-script": "^1.3.2"
+    "vue-advanced-chat": "^0.8.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

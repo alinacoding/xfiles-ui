@@ -29,10 +29,9 @@
 </template>
 
 <script>
-	//<button @click="greetUsers">Greet users</button>
 	import ChatWindow from 'vue-advanced-chat';
 	import 'vue-advanced-chat/dist/vue-advanced-chat.css';
-	import { roomsRef, usersRef } from '@/firestore'	
+	import { roomsRef, usersRef } from '@/firestore'
 	import { eventBus } from '../main'
 
 	export default {
@@ -87,7 +86,7 @@
 				disableForm: false,
 				addRoomUsername: '',
 				showAddRoom: true
-			}	
+			}
 		},
 
 		props: ['currentUserId'],
@@ -99,7 +98,7 @@
 					contentType: 0,
 					sender_id: this.currentUserId,
 					content,
-					timestamp: new Date()	
+					timestamp: new Date()
 				}
 				if (file) {
 					message.file = {
@@ -135,15 +134,15 @@
 				await roomsRef.doc(roomId).update({
 					isRead: isRead,
 					lastMessage: content,
-					timestamp: new Date()	
+					timestamp: new Date()
 				});
 				eventBus.$emit(
-				"sendMessage",
-					this.rooms.find(room => room.roomId === roomId)
+					"sendMessage",
+						this.rooms.find(room => room.roomId === roomId)
 				);
 				console.log("sendMessage", { content, roomId, file, replyMessage });
 					if (file) this.uploadFile({ file, messageId: id, roomId });
-				},		
+				},
 
 			greetUsers() {
 				if (!roomsRef.empty){
@@ -177,5 +176,5 @@
 
 		}
 
-	}	
+	}
 </script>

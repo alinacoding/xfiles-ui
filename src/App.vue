@@ -13,7 +13,6 @@
 </template>
 
 <script>
-//TODO: display rooms
 
 import ChatContainer from './components/ChatContainer'
 import { usersRef, roomsRef } from '@/firestore'
@@ -45,7 +44,7 @@ export default {
 				}
 			],
 			currentUserId: 'SGmFnBZB4xxMv9V4CVlW',
-			updatingData: false, 
+			updatingData: false,
 			showChat: true,
 			rooms: []
 		}
@@ -85,7 +84,7 @@ export default {
 			console.log('Added rooms data')
 			this.updatingData = false
 		},
-		
+
 		async deleteData() {
 			usersRef.get().then(user => {
 				user.forEach(user =>
