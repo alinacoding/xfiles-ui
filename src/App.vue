@@ -3,13 +3,13 @@
 		<span class="user-logged"
 		:class="{ 'user-logged-dark': theme === 'dark' }"
 		v-if="showOptions">
-			Logged as
-		</span>
-		<select v-model="currentUserId" v-if="showOptions">
-			<option v-for="user in users" :key="user._id" :value="user._id">
-				{{ user.username }}
-			</option>
-		</select>
+		Logged as
+	</span>
+	<select v-model="currentUserId" v-if="showOptions">
+		<option v-for="user in users" :key="user._id" :value="user._id">
+			{{ user.username }}
+		</option>
+	</select>
 
 	<div class="button-theme" v-if="showOptions">
 		<button @click="theme = 'light'" class="button-light">Light</button>
@@ -18,12 +18,13 @@
 		<button @click="resetData()" class="button-dark">Reset data</button>
 	</div>
 	<chat-container
-		:currentUserId="currentUserId"
-		:theme="theme"
-		@show-demo-options="showDemoOptions = $event"
-		:isDevice="isDevice"
-		v-if="showChat"
+	:currentUserId="currentUserId"
+	:theme="theme"
+	@show-demo-options="showDemoOptions = $event"
+	:isDevice="isDevice"
+	v-if="showChat"
 	/>
+	<my-react-terminal/>
 </div>
 
 </template>
@@ -31,13 +32,16 @@
 <script>
 
 import ChatContainer from './components/ChatContainer'
+import MyReactTerminal from './components/Terminal.vue'
+
 import { usersRef, roomsRef } from '@/firestore'
 
 export default {
 	name: 'App',
 
 	components: {
-		ChatContainer
+		ChatContainer,
+		MyReactTerminal
 	},
 
 	data () {
@@ -58,72 +62,73 @@ export default {
 					_id: '6jMsIXUrBHBj7o2cRlau',
 					username: 'Yoda',
 					avatar:
-						'https://vignette.wikia.nocookie.net/teamavatarone/images/4/45/Yoda.jpg/revision/latest?cb=20130224160049'
+					'https://vignette.wikia.nocookie.net/teamavatarone/images/4/45/Yoda.jpg/revision/latest?cb=20130224160049'
 				}
 			],
 			currentUserId: '6R0MijpK6M4AIrwaaCY2',
 			updatingData: false,
 			showChat: true,
-			showDemoOptions: true
+			showDemoOptions: true,
+			isDevice: false
 		}
 	},
 
-		watch: {
-			currentUserId() {
-				this.showChat = false
-				setTimeout(() => (this.showChat = true), 150)
-			}
+	watch: {
+		currentUserId() {
+			this.showChat = false
+			setTimeout(() => (this.showChat = true), 150)
+		}
+	},
+
+	computed: {
+		showOptions() {
+			return !this.isDevice || this.showDemoOptions
+		}
+	},
+
+
+	mounted() {
+		this.isDevice = window.innerWidth < 500
+		window.addEventListener('resize', ev => {
+			if (ev.isTrusted) this.isDevice = window.innerWidth < 500
+		})
+	},
+
+	methods: {
+
+		resetData() {
+			usersRef.get().then(val => {
+				val.forEach(val => {
+					usersRef.doc(val.id).delete()
+				})
+			})
+			roomsRef.get().then(val => {
+				val.forEach(async val => {
+					const ref = roomsRef.doc(val.id).collection('messages')
+					await ref.get().then(res => {
+						if (res.empty) return
+						res.docs.map(doc => ref.doc(doc.id).delete())
+					})
+					await roomsRef.doc(val.id).delete()
+				})
+			})
 		},
 
-		computed: {
-			showOptions() {
-				return !this.isDevice || this.showDemoOptions
-			}
-		},
-
-
-		mounted() {
-				this.isDevice = window.innerWidth < 500
-				window.addEventListener('resize', ev => {
-					if (ev.isTrusted) this.isDevice = window.innerWidth < 500
-				})
-		},
-
-		methods: {
-
-			resetData() {
-				usersRef.get().then(val => {
-						val.forEach(val => {
-								usersRef.doc(val.id).delete()
-						})
-				})
-				roomsRef.get().then(val => {
-						val.forEach(async val => {
-								const ref = roomsRef.doc(val.id).collection('messages')
-								await ref.get().then(res => {
-										if (res.empty) return
-										res.docs.map(doc => ref.doc(doc.id).delete())
-								})
-								await roomsRef.doc(val.id).delete()
-						})
-				})
-			},
-
-			async addData() {
-					this.updatingData = true
-					const user1 = this.users[0]
-					await usersRef.doc(user1._id).set(user1)
-					const user2 = this.users[1]
-					await usersRef.doc(user2._id).set(user2)
-					const user3 = this.users[2]
-					await usersRef.doc(user3._id).set(user3)
-					await roomsRef.add({users: [user1._id, user2._id]})
-					await roomsRef.add({users: [user1._id, user3._id]})
-					await roomsRef.add({users: [user1._id, user2._id, user3._id]})
-					this.updatingData = false
-			}
+		async addData() {
+			this.updatingData = true
+			const user1 = this.users[0]
+			await usersRef.doc(user1._id).set(user1)
+			const user2 = this.users[1]
+			await usersRef.doc(user2._id).set(user2)
+			const user3 = this.users[2]
+			await usersRef.doc(user3._id).set(user3)
+			await roomsRef.add({users: [user1._id, user2._id]})
+			await roomsRef.add({users: [user1._id, user3._id]})
+			await roomsRef.add({users: [user1._id, user2._id, user3._id]})
+			this.updatingData = false
 		}
 	}
+}
 
 </script>
 

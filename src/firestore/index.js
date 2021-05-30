@@ -32,12 +32,12 @@ export const deleteDbField = firebase.firestore.FieldValue.delete()
 
 /*const auth = firebase.auth();
 auth.signInAnonymously()
-  .then(() => {
-		console.log("Signed in anonymously")
-  })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-		console.log(errorCode + " " + errorMessage)
-  });
+.then(() => {
+console.log("Signed in anonymously")
+})
+.catch((error) => {
+const errorCode = error.code;
+const errorMessage = error.message;
+console.log(errorCode + " " + errorMessage)
+});
 */
