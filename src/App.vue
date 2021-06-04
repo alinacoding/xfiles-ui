@@ -24,15 +24,21 @@
 	:isDevice="isDevice"
 	v-if="showChat"
 	/>
+	<div>
 	<my-react-terminal/>
+	</div>
+	<div>
+	<codemirror/>
+</div>
 </div>
 
 </template>
 
 <script>
 
-import ChatContainer from './components/ChatContainer'
+import ChatContainer from './components/ChatContainer.vue'
 import MyReactTerminal from './components/Terminal.vue'
+import codemirror from './components/CodeMirror.vue'
 
 import { usersRef, roomsRef } from '@/firestore'
 
@@ -41,7 +47,8 @@ export default {
 
 	components: {
 		ChatContainer,
-		MyReactTerminal
+		MyReactTerminal,
+		codemirror
 	},
 
 	data () {
